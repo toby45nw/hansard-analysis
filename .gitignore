@@ -217,5 +217,12 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-data/
+data/*
 
+# Government timeline json file
+!data/government_timeline.json
+
+# Government time build info
+!data/government_timeline.json
+!data/government_timeline_build/
+!data/government_timeline_build/**
