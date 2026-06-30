@@ -12,7 +12,7 @@ DEBATES_DIR = REPO_ROOT / "data" / "debates"
 OUTPUT_PATH = REPO_ROOT / "data" / "debates.parquet"
 
 
-files = list(DEBATES_DIR.glob("*.xml"))
+files = sorted(DEBATES_DIR.glob("*.xml"))
 print(f"Number of files: {len(files)}")
 
 
@@ -60,7 +60,6 @@ for i, f in enumerate(files):
     if not date_match:
         continue
     date = date_match.group(1)
-    year = int(date[:4])
 
     try:
         root = ET.parse(f).getroot()
@@ -71,9 +70,8 @@ for i, f in enumerate(files):
     for speech in root.findall('speech'):
         a = speech.attrib
         rows.append({
-            'id':          a.get('id'),
+            'source_id':          a.get('id'),
             'date':        date,
-            'year':        year,
             'url':         a.get('url'),
             'time':        clean_time(a.get('time')),
             'person_id':   a.get('person_id'),
@@ -98,6 +96,10 @@ if rows:
 # concatenate chunks
 chunks = sorted(OUTPUT_PATH.parent.glob('debates_chunk_*.parquet'))
 df = pd.concat([pd.read_parquet(c) for c in chunks])
+
+df['date'] = pd.to_datetime(df['date'])
+df['speech_id'] = df.index
+
 df.to_parquet(OUTPUT_PATH, index=False)
 print(f"saved {len(df):,} rows")
 
