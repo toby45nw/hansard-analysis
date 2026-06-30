@@ -96,8 +96,9 @@ if rows:
 # concatenate chunks
 chunks = sorted(OUTPUT_PATH.parent.glob('debates_chunk_*.parquet'))
 df = pd.concat([pd.read_parquet(c) for c in chunks])
-
+ 
 df['date'] = pd.to_datetime(df['date'])
+df = df.reset_index(drop=True)
 df['speech_id'] = df.index
 
 df.to_parquet(OUTPUT_PATH, index=False)
